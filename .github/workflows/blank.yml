@@ -11,16 +11,16 @@ jobs:
 
     - uses: azure/docker-login@v1
       with:
-        login-server: mycontainer.azurecr.io
+        login-server: minecraftcb.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - run: |
-        docker build . -t mycontainer.azurecr.io/myapp:${{ github.sha }}
+        docker build . -t minecraftcb.azurecr.io/myapp:${{ github.sha }}
         docker push mycontainer.azurecr.io/myapp:${{ github.sha }}     
 
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'myapp'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        images: 'mycontainer.azurecr.io/myapp:${{ github.sha }}'
+        images: 'minecraftcb.azurecr.io/myapp:${{ github.sha }}'
