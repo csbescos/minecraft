@@ -1,26 +1,34 @@
-name: Linux Container Node Workflow
-
 on: [push]
 
+name: Linux_Container_Node_Workflow
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
+    # checkout the repo
+    - name: 'Checkout GitHub Action' 
+      uses: actions/checkout@main
+    
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
     - uses: azure/docker-login@v1
       with:
         login-server: minecraftcb.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-
     - run: |
-        docker build . -t minecraftcb.azurecr.io/myapp:${{ github.sha }}
-        docker push mycontainer.azurecr.io/myapp:${{ github.sha }}     
-
+        docker build . -t mycontainer.azurecr.io/myapp:${{ github.sha }}
+        docker push minecraftcb.azurecr.io/myapp:${{ github.sha }}     
+      
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'myapp'
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         images: 'minecraftcb.azurecr.io/myapp:${{ github.sha }}'
+    
+    - name: Azure logout
+      run: |
+        az logout
